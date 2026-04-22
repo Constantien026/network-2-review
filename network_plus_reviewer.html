@@ -1,0 +1,379 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.app { padding: 1rem 0; }
+.tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.tab { padding: 8px 16px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; cursor: pointer; font-size: 14px; color: var(--color-text-secondary); transition: all 0.15s; }
+.tab.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.tab:hover { background: var(--color-background-secondary); }
+.chapter-bar { display: flex; gap: 6px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.ch-btn { padding: 6px 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: transparent; cursor: pointer; font-size: 13px; color: var(--color-text-secondary); transition: all 0.15s; }
+.ch-btn.active { background: #1D9E75; color: white; border-color: #1D9E75; }
+.ch-btn:hover { border-color: var(--color-border-secondary); }
+.section { display: none; }
+.section.visible { display: block; }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+.q-num { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 6px; }
+.q-text { font-size: 15px; color: var(--color-text-primary); margin-bottom: 1rem; line-height: 1.5; }
+.options { display: flex; flex-direction: column; gap: 8px; }
+.opt { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); cursor: pointer; font-size: 14px; color: var(--color-text-primary); transition: all 0.15s; line-height: 1.4; }
+.opt:hover { background: var(--color-background-secondary); border-color: var(--color-border-secondary); }
+.opt.correct { background: #E1F5EE; border-color: #1D9E75; color: #085041; }
+.opt.wrong { background: #FCEBEB; border-color: #E24B4A; color: #501313; }
+.opt.revealed { pointer-events: none; }
+.opt-letter { font-weight: 500; min-width: 18px; }
+.explanation { margin-top: 12px; padding: 10px 12px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); font-size: 13px; color: var(--color-text-secondary); display: none; line-height: 1.5; }
+.explanation.show { display: block; }
+.score-bar { display: flex; gap: 16px; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.score-chip { font-size: 13px; color: var(--color-text-secondary); }
+.score-chip span { font-weight: 500; color: var(--color-text-primary); }
+.progress-wrap { flex: 1; min-width: 100px; height: 4px; background: var(--color-background-secondary); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #1D9E75; border-radius: 2px; transition: width 0.3s; }
+.flash-container { perspective: 800px; margin-bottom: 1.5rem; }
+.flashcard { width: 100%; min-height: 180px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.4s; border-radius: var(--border-radius-lg); }
+.flashcard.flipped { transform: rotateY(180deg); }
+.flash-face { position: absolute; top: 0; left: 0; right: 0; bottom: 0; backface-visibility: hidden; border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; min-height: 180px; }
+.flash-front { background: var(--color-background-primary); }
+.flash-back { background: var(--color-background-secondary); transform: rotateY(180deg); }
+.flash-label { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+.flash-term { font-size: 18px; font-weight: 500; color: var(--color-text-primary); text-align: center; line-height: 1.4; }
+.flash-def { font-size: 14px; color: var(--color-text-secondary); text-align: center; line-height: 1.6; }
+.flash-nav { display: flex; align-items: center; gap: 12px; justify-content: center; }
+.flash-counter { font-size: 14px; color: var(--color-text-secondary); }
+.nav-btn { padding: 8px 20px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; cursor: pointer; font-size: 14px; color: var(--color-text-primary); transition: all 0.15s; }
+.nav-btn:hover { background: var(--color-background-secondary); }
+.hint { font-size: 12px; color: var(--color-text-tertiary); text-align: center; margin-top: 8px; }
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+.stat-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem; }
+.stat-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.stat-val { font-size: 24px; font-weight: 500; color: var(--color-text-primary); }
+.reset-btn { padding: 8px 20px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; cursor: pointer; font-size: 14px; color: var(--color-text-secondary); transition: all 0.15s; margin-bottom: 1rem; }
+.reset-btn:hover { background: var(--color-background-secondary); }
+.chap-label { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 4px; }
+</style>
+
+<div class="app">
+<h2 class="sr-only">CompTIA Network+ Chapters 1–5 reviewer with flashcards and quiz modes</h2>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('quiz')">Quiz</button>
+  <button class="tab" onclick="switchTab('flash')">Flashcards</button>
+  <button class="tab" onclick="switchTab('summary')">Chapter summaries</button>
+</div>
+
+<div id="quiz" class="section visible">
+  <div class="chapter-bar" id="quiz-chapters"></div>
+  <div class="score-bar">
+    <div class="score-chip">Score: <span id="score-display">0 / 0</span></div>
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <button class="reset-btn" onclick="resetQuiz()">Reset</button>
+  </div>
+  <div id="questions-container"></div>
+</div>
+
+<div id="flash" class="section">
+  <div class="chapter-bar" id="flash-chapters"></div>
+  <div class="flash-container">
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="flash-face flash-front">
+        <div class="flash-label">term</div>
+        <div class="flash-term" id="flash-term"></div>
+      </div>
+      <div class="flash-face flash-back">
+        <div class="flash-label">definition</div>
+        <div class="flash-def" id="flash-def"></div>
+        <div class="chap-label" id="flash-chap"></div>
+      </div>
+    </div>
+  </div>
+  <p class="hint">Click card to flip</p>
+  <div class="flash-nav">
+    <button class="nav-btn" onclick="prevCard()">Prev</button>
+    <span class="flash-counter" id="flash-counter"></span>
+    <button class="nav-btn" onclick="nextCard()">Next</button>
+  </div>
+</div>
+
+<div id="summary" class="section">
+  <div id="summary-content"></div>
+</div>
+
+</div>
+
+<script>
+const ALL_CHAPTERS = ['All','Ch 1','Ch 2','Ch 3','Ch 4','Ch 5'];
+
+const questions = [
+  {ch:1, q:"What is a computer network?", opts:["A single computer connected to the internet","An interconnection of two or more computing devices","A server that stores files","A type of wireless connection"], ans:1, exp:"A network is defined as an interconnection of two or more computing devices that can serve purposes like file sharing, email, VoIP, and web browsing."},
+  {ch:1, q:"What is the difference between a hub and a switch?", opts:["A hub is faster than a switch","A hub uses MAC addresses; a switch broadcasts to all ports","A switch makes forwarding decisions based on MAC addresses; a hub broadcasts to all ports","There is no difference"], ans:2, exp:"A switch forwards frames based on physical (MAC) addresses, while a hub broadcasts all incoming traffic to every connected device."},
+  {ch:1, q:"Which network type typically covers a single metropolitan area like multiple offices in one city?", opts:["LAN","WAN","MAN","PAN"], ans:2, exp:"A Metropolitan-Area Network (MAN) is between a LAN and WAN, typically spanning a metropolitan area such as multiple offices within the same city."},
+  {ch:1, q:"A network topology that describes how traffic actually flows (not physical cables) is called:", opts:["Physical topology","Logical topology","Star topology","Bus topology"], ans:1, exp:"Logical topology describes the actual traffic flow patterns on the network, which may differ from the physical cable layout."},
+  {ch:1, q:"In a client-server network:", opts:["All resources reside on individual client machines","No server is needed","All resources reside on a centralized server","Every device acts as both client and server"], ans:2, exp:"Client-server networks centralize resources on a server that clients access, as opposed to peer-to-peer where resources are distributed among clients."},
+  {ch:1, q:"What does a router use to make forwarding decisions?", opts:["MAC addresses","Physical cable connections","Logical (IP) addresses","Port numbers"], ans:2, exp:"Routers operate at Layer 3 and make forwarding decisions based on logical network addresses (IP addresses), unlike switches which use MAC addresses."},
+  {ch:1, q:"A full-mesh topology is characterized by:", opts:["Every device connected to a central hub","Each device connected only to its nearest neighbor","Every device directly connected to every other device","Devices arranged in a ring"], ans:2, exp:"In a full-mesh topology, every node has a direct connection to every other node, providing maximum redundancy."},
+  {ch:1, q:"A converged network is one that:", opts:["Only carries data traffic","Transports multiple forms of traffic such as video, voice, and data","Connects two different LANs","Uses only wireless connections"], ans:1, exp:"A converged network carries multiple forms of traffic—video, voice, and data—over a single network infrastructure."},
+
+  {ch:2, q:"What is the primary purpose of a network reference model like OSI?", opts:["To increase network speed","To break communication into layers for easier development and standardization","To eliminate the need for hardware","To replace TCP/IP"], ans:1, exp:"The OSI model breaks network communication into smaller, standardized layers, enabling multiple-vendor development and preventing changes in one layer from affecting others."},
+  {ch:2, q:"At which OSI layer do switches primarily operate?", opts:["Layer 1 – Physical","Layer 2 – Data Link","Layer 3 – Network","Layer 4 – Transport"], ans:1, exp:"Switches operate at Layer 2 (Data Link) and make forwarding decisions based on MAC addresses."},
+  {ch:2, q:"What is the PDU name at the Network layer?", opts:["Bits","Frames","Packets","Segments"], ans:2, exp:"Network layer (Layer 3) PDUs are called Packets. Frames are at Layer 2, Segments at Layer 4, and Bits at Layer 1."},
+  {ch:2, q:"TCP differs from UDP in that TCP is:", opts:["Faster and connectionless","Connection-oriented and reliable with acknowledgements","Only used for video streaming","Stateless and has no handshake"], ans:1, exp:"TCP is connection-oriented and reliable, using a three-way handshake and acknowledgements to ensure delivery. UDP is connectionless and best-effort."},
+  {ch:2, q:"What does TTL (Time-to-Live) accomplish in an IP packet?", opts:["Encrypts the packet","Increases transmission speed","Eliminates packets trapped in routing loops by decrementing at each router","Identifies the destination port"], ans:2, exp:"TTL decreases by one each time a packet passes through a router. When it reaches zero, the packet is discarded, preventing endless routing loops."},
+  {ch:2, q:"Which layer of the OSI model handles encryption and data formatting?", opts:["Session (Layer 5)","Presentation (Layer 6)","Application (Layer 7)","Transport (Layer 4)"], ans:1, exp:"The Presentation layer (Layer 6) handles data formatting, translation, and encryption/decryption."},
+  {ch:2, q:"Port numbers in the range 0–1023 are known as:", opts:["Ephemeral ports","User ports","Dynamic ports","Well-known (system) ports"], ans:3, exp:"Ports 0–1023 are System/Well-known ports assigned by IETF for standards-track protocols. Ports 1024–49151 are User ports; 49152–65535 are Dynamic/Ephemeral."},
+  {ch:2, q:"What technology allows multiple channels to share the same medium by using different frequency ranges?", opts:["TDM","StatTDM","FDM (Frequency Division Multiplexing)","Baseband transmission"], ans:2, exp:"FDM (Frequency Division Multiplexing) splits the medium into multiple channels each using a different frequency range, like cable TV."},
+
+  {ch:3, q:"Which cable type uses two conductors — an inner wire and an outer braided shield?", opts:["Twisted-pair","Fiber-optic","Coaxial cable","Plenum-rated cable"], ans:2, exp:"Coaxial cable has an inner insulated conductor that carries data and an outer braided metal shield for protection."},
+  {ch:3, q:"CAT 5e twisted-pair cable supports throughput up to:", opts:["10 Mbps","100 Mbps","1000 Mbps (1 Gbps)","10 Gbps"], ans:2, exp:"CAT 5e (Enhanced Category 5) has a higher twist ratio than CAT 5 and supports up to 1000 Mbps throughput."},
+  {ch:3, q:"What is the key advantage of single-mode fiber (SMF) over multimode fiber (MMF)?", opts:["SMF is cheaper","SMF uses a larger core diameter","SMF supports higher bandwidth over longer distances","SMF uses LED light sources"], ans:2, exp:"SMF uses a narrow core (<10 microns) with laser-generated light traveling one path, allowing higher bandwidth and longer distances with less signal dispersion."},
+  {ch:3, q:"A DHCP server automatically assigns which set of parameters to a host?", opts:["Only an IP address","IP address and subnet mask only","IP address, subnet mask, default gateway, and DNS server","MAC address and IP address"], ans:2, exp:"DHCP dynamically assigns IP address, subnet mask, default gateway, and DNS server address to network devices."},
+  {ch:3, q:"What is the role of a proxy server?", opts:["It assigns IP addresses dynamically","It makes requests on behalf of clients and can cache content","It routes packets between networks","It provides DNS resolution"], ans:1, exp:"A proxy server forwards client requests to the internet and can cache responses, reducing bandwidth usage and providing content filtering."},
+  {ch:3, q:"At which OSI layer does a hub operate, and what does it do with received frames?", opts:["Layer 2; forwards based on MAC","Layer 1; broadcasts all bits to every port except the source","Layer 3; routes based on IP","Layer 2; learns MAC addresses"], ans:1, exp:"Hubs operate at Layer 1 (Physical) and simply retransmit received bits out all other ports without any intelligence — they're multiport repeaters."},
+  {ch:3, q:"Plenum-rated cable is required in plenum spaces because it:", opts:["Costs less than PVC cable","Produces less smoke and fewer fumes when burned","Transmits data faster","Supports Power over Ethernet"], ans:1, exp:"Plenum-rated cable produces significantly less smoke and toxic fumes compared to PVC-rated cable, making it required by fire code in air-handling spaces."},
+  {ch:3, q:"A content switch (load balancer) primarily serves to:", opts:["Cache web content locally","Distribute incoming requests across multiple servers","Terminate VPN tunnels","Resolve domain names to IP addresses"], ans:1, exp:"A content switch (load balancer) distributes incoming client requests across multiple servers in a server farm to prevent any single server from being overwhelmed."},
+
+  {ch:4, q:"CSMA/CD stands for:", opts:["Carrier Signal Multiple Access / Collision Detection","Carrier Sense Multiple Access with Collision Detection","Channel Shared Media Access / Collision Delay","Controlled Signal Management Access / Channel Division"], ans:1, exp:"CSMA/CD (Carrier Sense Multiple Access with Collision Detection) is the media access method used by Ethernet to detect and recover from collisions."},
+  {ch:4, q:"What problem does Spanning Tree Protocol (STP) solve?", opts:["It prevents IP address conflicts","It stops broadcast frames from looping indefinitely in networks with redundant links","It load-balances traffic across multiple switches","It encrypts VLAN traffic"], ans:1, exp:"Without STP, frames would loop forever in networks with physically redundant links, causing broadcast storms and MAC table corruption. STP blocks certain ports to ensure only one active path exists."},
+  {ch:4, q:"VLANs allow a switch to:", opts:["Operate at Layer 3 only","Separate ports into multiple broadcast domains through configuration","Connect two different WANs","Replace the need for routers entirely"], ans:1, exp:"VLANs divide a switch's ports into separate broadcast domains based on configuration, even though all ports are physically on the same switch."},
+  {ch:4, q:"In STP, the switch elected as Root Switch is determined by:", opts:["Highest MAC address","Lowest bridge ID (priority + MAC address)","Most ports","Highest IP address"], ans:1, exp:"The Root Switch is elected based on the lowest Bridge ID, which is a combination of a 2-byte priority value and the switch's 6-byte MAC address."},
+  {ch:4, q:"802.1Q tagging is used for:", opts:["Power over Ethernet","Link aggregation","VLAN trunking between switches","User authentication"], ans:2, exp:"802.1Q adds a VLAN tag to Ethernet frames, allowing multiple VLANs to be carried over a single trunk link between switches."},
+  {ch:4, q:"Link aggregation allows:", opts:["A switch port to supply power to connected devices","Multiple physical links to be combined into one logical link for more bandwidth","Traffic to be mirrored to a monitoring port","Automatic assignment of VLAN membership"], ans:1, exp:"Link aggregation logically combines multiple physical connections between switches into a single higher-bandwidth logical connection, alleviating congestion."},
+  {ch:4, q:"In 802.1X authentication, the 'supplicant' refers to:", opts:["The RADIUS server doing authentication","The switch or AP forwarding requests","The device requesting network access","The VLAN assigned to the user"], ans:2, exp:"In 802.1X, the supplicant is the device seeking network access. The authenticator (switch/AP) forwards its credentials to the authentication server."},
+  {ch:4, q:"A full-duplex connection means:", opts:["Only one device can transmit at a time","Transmission occurs in both directions simultaneously","Communication goes in one direction only","Collisions are more frequent"], ans:1, exp:"Full-duplex allows simultaneous bi-directional transmission, eliminating collisions. Half-duplex allows both directions but only one at a time."},
+
+  {ch:5, q:"An IPv4 address is how many bits long, written in what notation?", opts:["16 bits; hexadecimal","64 bits; dotted-decimal","32 bits; dotted-decimal","128 bits; colon-hexadecimal"], ans:2, exp:"IPv4 addresses are 32 bits long, divided into four 8-bit octets and written in dotted-decimal notation (e.g., 192.168.1.1)."},
+  {ch:5, q:"Which private IP address range belongs to Class B?", opts:["10.0.0.0 – 10.255.255.255","192.168.0.0 – 192.168.255.255","172.16.0.0 – 172.31.255.255","127.0.0.0 – 127.255.255.255"], ans:2, exp:"The Class B private range is 172.16.0.0 – 172.31.255.255 with a default mask of 255.255.0.0. (10.x.x.x is Class A; 192.168.x.x is Class C.)"},
+  {ch:5, q:"APIPA (Automatic Private IP Addressing) assigns addresses from which range?", opts:["192.168.0.0/16","10.0.0.0/8","169.254.0.0/16","172.16.0.0/12"], ans:2, exp:"When a device cannot reach a DHCP server, APIPA self-assigns an address from 169.254.0.0/16, allowing local communication without a DHCP server."},
+  {ch:5, q:"The formula for calculating the number of usable hosts per subnet is:", opts:["2^n","2^n – 1","2^n – 2","2^(32-n)"], ans:2, exp:"The number of usable hosts per subnet is 2^n – 2, where n is the number of host bits. Two addresses are reserved: the network address and the broadcast address."},
+  {ch:5, q:"IPv6 addresses are how many bits long?", opts:["32 bits","64 bits","128 bits","256 bits"], ans:2, exp:"IPv6 uses 128-bit addresses, providing approximately 3.4 × 10^38 possible addresses, enough for many generations of internet growth."},
+  {ch:5, q:"Which type of IPv4 traffic goes from one source to all devices on the network?", opts:["Unicast","Multicast","Broadcast","Anycast"], ans:2, exp:"Broadcast traffic is sent from one source to all devices in the broadcast domain. Unicast is one-to-one; multicast is one-to-many specific group."},
+  {ch:5, q:"A Class C default subnet mask in prefix notation is:", opts:["/8","/16","/24","/32"], ans:2, exp:"Class C uses the first 24 bits for the network, so the default mask is 255.255.255.0 or /24 in prefix (CIDR) notation."},
+  {ch:5, q:"BOOTP differs from DHCP in that BOOTP:", opts:["Can assign DNS server addresses","Only assigns IP, subnet mask, and default gateway (for diskless workstations)","Supports automatic lease renewal","Uses UDP port 67 on the server"], ans:1, exp:"BOOTP (Bootstrap Protocol) only assigns IP address, subnet mask, and default gateway — primarily for diskless workstations. DHCP extends this with DNS server info, lease times, and more."},
+];
+
+const flashcards = [
+  {ch:1,term:"LAN",def:"Local-Area Network — a network confined to a small geographic area like a building or campus."},
+  {ch:1,term:"WAN",def:"Wide-Area Network — spans large geographic areas, connecting multiple LANs typically via ISP links."},
+  {ch:1,term:"MAC Address",def:"Media Access Control address — a physical address burned into a NIC, used by switches for forwarding decisions."},
+  {ch:1,term:"Router",def:"A Layer 3 device that makes forwarding decisions based on logical (IP) addresses to route traffic between networks."},
+  {ch:1,term:"Peer-to-peer network",def:"A network where resources are distributed among clients with no dedicated server; each device can act as both client and server."},
+  {ch:2,term:"OSI Model",def:"7-layer framework: Physical, Data Link, Network, Transport, Session, Presentation, Application — used to standardize network communication."},
+  {ch:2,term:"TCP",def:"Transmission Control Protocol — connection-oriented, reliable Layer 4 protocol with handshake and acknowledgements."},
+  {ch:2,term:"UDP",def:"User Datagram Protocol — connectionless, unreliable Layer 4 protocol with no handshake; used where speed matters more than reliability."},
+  {ch:2,term:"CSMA/CD",def:"Carrier Sense Multiple Access with Collision Detection — Ethernet's media access method for detecting and recovering from collisions."},
+  {ch:2,term:"Frame",def:"The PDU at Layer 2 (Data Link). Contains source/destination MAC addresses, data, and a checksum (CRC)."},
+  {ch:3,term:"UTP",def:"Unshielded Twisted Pair — the most common LAN media; twisted copper pairs without a metal shield around them."},
+  {ch:3,term:"Single-mode fiber",def:"Fiber-optic cable with a narrow core (<10 microns); laser light travels one path, supporting longer distances and higher bandwidth."},
+  {ch:3,term:"DHCP",def:"Dynamic Host Configuration Protocol — automatically assigns IP address, subnet mask, default gateway, and DNS to hosts."},
+  {ch:3,term:"VPN Concentrator",def:"Device that terminates multiple VPN tunnels, providing secure encrypted connections through untrusted networks like the internet."},
+  {ch:3,term:"DNS",def:"Domain Name System — translates human-readable domain names (e.g., www.google.com) into IP addresses computers can use."},
+  {ch:4,term:"VLAN",def:"Virtual LAN — a logical grouping of switch ports into separate broadcast domains, configured via software rather than physical wiring."},
+  {ch:4,term:"STP",def:"Spanning Tree Protocol — prevents Layer 2 loops by blocking redundant paths, electing a Root Switch based on lowest Bridge ID."},
+  {ch:4,term:"802.1Q",def:"VLAN trunking standard — adds a 4-byte tag to Ethernet frames so multiple VLANs can traverse a single trunk link between switches."},
+  {ch:4,term:"PoE",def:"Power over Ethernet — delivers electrical power via Ethernet cable to devices like IP phones and wireless access points."},
+  {ch:4,term:"Link aggregation",def:"Combining multiple physical links into one logical link to increase bandwidth and provide redundancy between switches."},
+  {ch:5,term:"IPv4",def:"32-bit addressing scheme written in dotted-decimal; divided into network and host portions defined by the subnet mask."},
+  {ch:5,term:"Subnet mask",def:"Identifies which portion of an IP address is the network (bits set to 1) and which is the host (bits set to 0)."},
+  {ch:5,term:"APIPA",def:"Automatic Private IP Addressing — self-assigns an address in 169.254.0.0/16 when no DHCP server is reachable."},
+  {ch:5,term:"IPv6",def:"128-bit addressing with ~3.4×10^38 addresses; features simplified header, no broadcast, and built-in support for coexistence with IPv4."},
+  {ch:5,term:"Subnetting",def:"Dividing a classful network by borrowing host bits to create multiple smaller networks (subnets) for better address efficiency and security."},
+];
+
+const summaries = [
+  {ch:1, title:"Ch 1 — Introducing Computer Networks", points:[
+    "A network interconnects 2+ devices for sharing files, email, VoIP, and web access.",
+    "Key components: clients, servers, hubs, switches, routers, media, and WAN links.",
+    "Networks by geography: LAN, WAN, CAN, MAN, PAN.",
+    "Physical topology = cable layout; logical topology = actual traffic flow.",
+    "Topologies include bus, ring, star, hub-and-spoke, full-mesh, and partial-mesh.",
+    "Resource location: client-server (centralized) vs. peer-to-peer (distributed).",
+  ]},
+  {ch:2, title:"Ch 2 — Dissecting the OSI Model", points:[
+    "OSI has 7 layers: Physical, Data Link, Network, Transport, Session, Presentation, Application.",
+    "PDUs: Bits (L1) → Frames (L2) → Packets (L3) → Segments (L4).",
+    "TCP = reliable, connection-oriented; UDP = fast, connectionless.",
+    "TTL prevents routing loops by decrementing at each router hop.",
+    "Port ranges: Well-known (0–1023), User (1024–49151), Dynamic (49152–65535).",
+    "TCP/IP stack maps to OSI: Network Interface, Internet, Transport, Application.",
+  ]},
+  {ch:3, title:"Ch 3 — Identifying Network Components", points:[
+    "Media types: coaxial (RG-6/58/59), twisted-pair (UTP/STP CAT 3–6e), fiber (MMF/SMF).",
+    "Infrastructure devices: Hub (L1), Bridge (L2), Switch (L2), Multilayer Switch (L3+), Router (L3).",
+    "Hubs broadcast to all ports; switches forward based on MAC address tables.",
+    "Routers provide separate collision AND broadcast domains per port.",
+    "Specialized devices: VPN concentrator, firewall, DNS server, DHCP server, proxy server.",
+    "VoIP and virtualization technologies are reshaping traditional data centers.",
+  ]},
+  {ch:4, title:"Ch 4 — Understanding Ethernet", points:[
+    "Ethernet evolved from 10BASE5 (coax) to 100 Gbps fiber standards.",
+    "CSMA/CD: listen before transmitting; detect and recover from collisions with back-off timers.",
+    "VLANs divide a switch into multiple broadcast domains via port configuration.",
+    "802.1Q trunk tags allow multiple VLANs to travel between switches on one link.",
+    "STP prevents Layer 2 loops by electing a Root Switch and blocking redundant ports.",
+    "Other features: link aggregation, PoE, port mirroring, 802.1X authentication, first-hop redundancy.",
+  ]},
+  {ch:5, title:"Ch 5 — Working with IP Addresses", points:[
+    "IPv4 = 32-bit, dotted-decimal; divided into Class A (/8), B (/16), C (/24).",
+    "Private ranges: 10.x.x.x (A), 172.16–31.x.x (B), 192.168.x.x (C). Loopback: 127.0.0.1.",
+    "Traffic types: unicast (1→1), broadcast (1→all), multicast (1→group).",
+    "Address assignment: static, BOOTP, DHCP, or APIPA (169.254.0.0/16 fallback).",
+    "Subnetting borrows host bits to create subnets; usable hosts = 2^n – 2.",
+    "IPv6 uses 128-bit addresses; supports unicast, multicast, anycast — no broadcast.",
+  ]},
+];
+
+let currentChapterFilter = 0;
+let answered = {};
+let flashIndex = 0;
+let flashChapterFilter = 0;
+let filteredFlash = [];
+let isFlipped = false;
+
+function getFilteredQuestions() {
+  if(currentChapterFilter === 0) return questions;
+  return questions.filter(q => q.ch === currentChapterFilter);
+}
+
+function getFilteredFlash() {
+  if(flashChapterFilter === 0) return flashcards;
+  return flashcards.filter(f => f.ch === flashChapterFilter);
+}
+
+function buildChapterBar(containerId, current, setter) {
+  const bar = document.getElementById(containerId);
+  bar.innerHTML = '';
+  ALL_CHAPTERS.forEach((label, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ch-btn' + (i === current ? ' active' : '');
+    btn.textContent = label;
+    btn.onclick = () => setter(i);
+    bar.appendChild(btn);
+  });
+}
+
+function setQuizChapter(i) {
+  currentChapterFilter = i;
+  answered = {};
+  buildChapterBar('quiz-chapters', i, setQuizChapter);
+  renderQuestions();
+  updateScore();
+}
+
+function setFlashChapter(i) {
+  flashChapterFilter = i;
+  flashIndex = 0;
+  isFlipped = false;
+  filteredFlash = getFilteredFlash();
+  buildChapterBar('flash-chapters', i, setFlashChapter);
+  renderFlashcard();
+}
+
+function renderQuestions() {
+  const qs = getFilteredQuestions();
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  qs.forEach((q, qi) => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.id = 'q-' + qi;
+    const chLabel = `Ch ${q.ch}`;
+    let optsHTML = q.opts.map((o, oi) => {
+      let cls = 'opt';
+      const key = qi;
+      if(answered[key] !== undefined) {
+        cls += ' revealed';
+        if(oi === q.ans) cls += ' correct';
+        else if(oi === answered[key] && answered[key] !== q.ans) cls += ' wrong';
+      }
+      return `<div class="${cls}" onclick="answer(${qi},${oi})"><span class="opt-letter">${String.fromCharCode(65+oi)}</span>${o}</div>`;
+    }).join('');
+    const expShow = answered[qi] !== undefined ? 'show' : '';
+    div.innerHTML = `<div class="q-num">${chLabel} &bull; Question ${qi+1} of ${qs.length}</div>
+<div class="q-text">${q.q}</div>
+<div class="options">${optsHTML}</div>
+<div class="explanation ${expShow}">${q.exp}</div>`;
+    container.appendChild(div);
+  });
+}
+
+function answer(qi, oi) {
+  if(answered[qi] !== undefined) return;
+  answered[qi] = oi;
+  renderQuestions();
+  updateScore();
+}
+
+function updateScore() {
+  const qs = getFilteredQuestions();
+  let correct = 0, total = 0;
+  qs.forEach((q, i) => {
+    if(answered[i] !== undefined) { total++; if(answered[i] === q.ans) correct++; }
+  });
+  document.getElementById('score-display').textContent = `${correct} / ${total}`;
+  const pct = qs.length ? (total / qs.length * 100) : 0;
+  document.getElementById('progress-fill').style.width = Math.round(pct) + '%';
+}
+
+function resetQuiz() {
+  answered = {};
+  renderQuestions();
+  updateScore();
+}
+
+function renderFlashcard() {
+  filteredFlash = getFilteredFlash();
+  if(filteredFlash.length === 0) return;
+  const card = filteredFlash[flashIndex];
+  document.getElementById('flash-term').textContent = card.term;
+  document.getElementById('flash-def').textContent = card.def;
+  document.getElementById('flash-chap').textContent = `Chapter ${card.ch}`;
+  document.getElementById('flash-counter').textContent = `${flashIndex + 1} / ${filteredFlash.length}`;
+  const fc = document.getElementById('flashcard');
+  fc.classList.remove('flipped');
+  isFlipped = false;
+}
+
+function flipCard() {
+  const fc = document.getElementById('flashcard');
+  isFlipped = !isFlipped;
+  fc.classList.toggle('flipped', isFlipped);
+}
+
+function nextCard() {
+  filteredFlash = getFilteredFlash();
+  flashIndex = (flashIndex + 1) % filteredFlash.length;
+  renderFlashcard();
+}
+
+function prevCard() {
+  filteredFlash = getFilteredFlash();
+  flashIndex = (flashIndex - 1 + filteredFlash.length) % filteredFlash.length;
+  renderFlashcard();
+}
+
+function renderSummary() {
+  const container = document.getElementById('summary-content');
+  container.innerHTML = summaries.map(s => `
+    <div class="card">
+      <div class="q-num" style="margin-bottom:8px;font-weight:500;font-size:14px;color:var(--color-text-primary)">${s.title}</div>
+      ${s.points.map(p => `<div style="display:flex;gap:10px;margin-bottom:6px;font-size:14px;color:var(--color-text-secondary);line-height:1.5"><span style="color:#1D9E75;font-size:16px;margin-top:-1px">&#10003;</span><span>${p}</span></div>`).join('')}
+    </div>
+  `).join('');
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(name).classList.add('visible');
+  document.querySelectorAll('.tab').forEach(t => { if(t.textContent.toLowerCase().startsWith(name.charAt(0))) t.classList.add('active'); });
+  if(name==='flash') renderFlashcard();
+  if(name==='summary') renderSummary();
+}
+
+buildChapterBar('quiz-chapters', 0, setQuizChapter);
+buildChapterBar('flash-chapters', 0, setFlashChapter);
+filteredFlash = getFilteredFlash();
+renderQuestions();
+updateScore();
+renderFlashcard();
+</script>
